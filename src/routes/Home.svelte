@@ -1,5 +1,6 @@
 <script>
-  import { addDoc, collection } from 'firebase/firestore';
+  import { onDestroy } from 'svelte';
+  import { addDoc, collection, onSnapshot } from 'firebase/firestore';
   import { databaseFirestore } from './../firebase.js';
 
   let getValuesTaskForm = {
@@ -7,10 +8,28 @@
     description: '',
   };
 
+  let valuesOfEachTask = [];
+
   async function handleSubmitForm() {
     await addDoc(collection(databaseFirestore, 'tasks'), getValuesTaskForm);
-    console.log('task saved');
   }
+
+  function listDataOfTask() {
+    const unsub = onSnapshot(
+      collection(databaseFirestore, 'tasks'),
+      (querySnapshot) => {
+        valuesOfEachTask = querySnapshot.docs.map((doc) => {
+          return { ...doc.data(), taskID: doc.id };
+        });
+      },
+      (err) => {
+        alert(err);
+      }
+    );
+    onDestroy(unsub);
+  }
+
+  listDataOfTask();
 </script>
 
 <section>
@@ -33,4 +52,11 @@
 
     <button> save </button>
   </form>
+
+  {#each valuesOfEachTask as task}
+    <div>
+      <h5>{task.title}</h5>
+      <p>{task.description}</p>
+    </div>
+  {/each}
 </section>
