@@ -1,11 +1,15 @@
 <script>
+  import { addDoc, collection } from 'firebase/firestore';
+  import { databaseFirestore } from './../firebase.js';
+
   let getValuesTaskForm = {
     title: '',
     description: '',
   };
 
-  function handleSubmitForm() {
-    console.log(getValuesTaskForm);
+  async function handleSubmitForm() {
+    await addDoc(collection(databaseFirestore, 'tasks'), getValuesTaskForm);
+    console.log('task saved');
   }
 </script>
 
