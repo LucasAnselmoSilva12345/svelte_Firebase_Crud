@@ -9,15 +9,21 @@
   } from 'firebase/firestore';
   import { databaseFirestore } from './../firebase.js';
 
-  let getValuesTaskForm = {
+  let setValuesTaskForm = {
     title: '',
     description: '',
   };
 
   let valuesOfEachTask = [];
 
-  async function handleSubmitForm() {
-    await addDoc(collection(databaseFirestore, 'tasks'), getValuesTaskForm);
+  let editStatus = false;
+
+  async function createTask() {
+    try {
+      await addDoc(collection(databaseFirestore, 'tasks'), setValuesTaskForm);
+    } catch (error) {
+      alert(error);
+    }
   }
 
   function listDataOfTask() {
@@ -36,10 +42,28 @@
   }
   listDataOfTask();
 
+  function handleEditTask(currentTask) {
+    (setValuesTaskForm.title = currentTask.title),
+      (setValuesTaskForm.description = currentTask.description);
+    editStatus = true;
+  }
+
   async function handleDeleteTask(id) {
     try {
       await deleteDoc(doc(databaseFirestore, 'tasks', id));
       alert('Task deleted');
+    } catch (error) {
+      alert(error);
+    }
+  }
+
+  function handleSubmitForm() {
+    try {
+      if (editStatus) {
+        alert('updating task');
+      } else {
+        createTask();
+      }
     } catch (error) {
       alert(error);
     }
@@ -52,7 +76,7 @@
     <input
       type="text"
       placeholder="Write a title"
-      bind:value={getValuesTaskForm.title}
+      bind:value={setValuesTaskForm.title}
     />
 
     <label for="description">Description</label>
@@ -61,7 +85,7 @@
       id="description"
       rows="3"
       placeholder="Write a description"
-      bind:value={getValuesTaskForm.description}
+      bind:value={setValuesTaskForm.description}
     />
 
     <button> save </button>
@@ -72,6 +96,7 @@
       <h5>{task.title}</h5>
       <p>{task.description}</p>
       <button on:click={handleDeleteTask(task.id)}> Delete </button>
+      <button on:click={handleEditTask(task)}> Edit </button>
     </div>
   {/each}
 </section>
