@@ -9,6 +9,7 @@
     updateDoc,
   } from 'firebase/firestore';
   import { databaseFirestore } from './../firebase.js';
+  import Toastify from 'toastify-js';
 
   let setValuesTaskForm = {
     title: '',
@@ -23,6 +24,19 @@
   async function createTask() {
     try {
       await addDoc(collection(databaseFirestore, 'tasks'), setValuesTaskForm);
+
+      Toastify({
+        text: 'Created task',
+        duration: 3000,
+        newWindow: true,
+        close: false,
+        gravity: 'top',
+        position: 'right',
+        stopOnFocus: true,
+        style: {
+          background: '#37b24d',
+        },
+      }).showToast();
     } catch (error) {
       alert(error);
     }
@@ -65,7 +79,18 @@
   async function handleDeleteTask(id) {
     try {
       await deleteDoc(doc(databaseFirestore, 'tasks', id));
-      alert('Task deleted');
+      Toastify({
+        text: 'Task deleted',
+        duration: 3000,
+        newWindow: true,
+        close: false,
+        gravity: 'top',
+        position: 'right',
+        stopOnFocus: true,
+        style: {
+          background: '#ff2500',
+        },
+      }).showToast();
     } catch (error) {
       alert(error);
     }
