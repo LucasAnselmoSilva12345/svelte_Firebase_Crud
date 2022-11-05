@@ -6,6 +6,7 @@
     collection,
     onSnapshot,
     deleteDoc,
+    updateDoc,
   } from 'firebase/firestore';
   import { databaseFirestore } from './../firebase.js';
 
@@ -17,6 +18,7 @@
   let valuesOfEachTask = [];
 
   let editStatus = false;
+  let currentId = '';
 
   async function createTask() {
     try {
@@ -45,7 +47,19 @@
   function handleEditTask(currentTask) {
     (setValuesTaskForm.title = currentTask.title),
       (setValuesTaskForm.description = currentTask.description);
+    currentId = currentTask.id;
     editStatus = true;
+  }
+
+  async function updateTask() {
+    try {
+      await updateDoc(
+        doc(databaseFirestore, 'tasks', currentId),
+        setValuesTaskForm
+      );
+    } catch (error) {
+      alert(error);
+    }
   }
 
   async function handleDeleteTask(id) {
@@ -60,13 +74,21 @@
   function handleSubmitForm() {
     try {
       if (editStatus) {
-        alert('updating task');
+        updateTask();
       } else {
         createTask();
       }
     } catch (error) {
       alert(error);
     }
+
+    setValuesTaskForm = {
+      title: '',
+      description: '',
+    };
+
+    editStatus = false;
+    currentId = '';
   }
 </script>
 
