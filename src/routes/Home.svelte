@@ -1,6 +1,12 @@
 <script>
   import { onDestroy } from 'svelte';
-  import { addDoc, collection, onSnapshot } from 'firebase/firestore';
+  import {
+    doc,
+    addDoc,
+    collection,
+    onSnapshot,
+    deleteDoc,
+  } from 'firebase/firestore';
   import { databaseFirestore } from './../firebase.js';
 
   let getValuesTaskForm = {
@@ -19,7 +25,7 @@
       collection(databaseFirestore, 'tasks'),
       (querySnapshot) => {
         valuesOfEachTask = querySnapshot.docs.map((doc) => {
-          return { ...doc.data(), taskID: doc.id };
+          return { ...doc.data(), id: doc.id };
         });
       },
       (err) => {
@@ -28,8 +34,16 @@
     );
     onDestroy(unsub);
   }
-
   listDataOfTask();
+
+  async function handleDeleteTask(id) {
+    try {
+      await deleteDoc(doc(databaseFirestore, 'tasks', id));
+      alert('Task deleted');
+    } catch (error) {
+      alert(error);
+    }
+  }
 </script>
 
 <section>
@@ -57,6 +71,7 @@
     <div>
       <h5>{task.title}</h5>
       <p>{task.description}</p>
+      <button on:click={handleDeleteTask(task.id)}> Delete </button>
     </div>
   {/each}
 </section>
